@@ -1,0 +1,23 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build artifacts
+.next/
+out/
+build/
+dist/
+
+# Cache
+.turbo
+.vercel
+.cache
+.pnpm-store/
+
+# Misc
+.DS_Store
+*.pem
+
+# Generated
+pnpm-lock.yaml
