@@ -28,9 +28,7 @@ export function useContainerSize(ref: RefObject<HTMLElement | null>): DOMRect {
     setSize((prevRect) => {
       if (
         Math.round(prevRect.width) === Math.round(newRect.width) &&
-        Math.round(prevRect.height) === Math.round(newRect.height) &&
-        Math.round(prevRect.x) === Math.round(newRect.x) &&
-        Math.round(prevRect.y) === Math.round(newRect.y)
+        Math.round(prevRect.height) === Math.round(newRect.height)
       ) {
         return prevRect;
       }

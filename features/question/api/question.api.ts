@@ -1,4 +1,9 @@
-import type { CreateQuestionInput, CreateQuestionResult } from '@/features/question/types';
+import type {
+  CreateQuestionInput,
+  CreateQuestionResult,
+  GetQuestionSetNavigationResult,
+  GetQuestionSetParams
+} from '@/features/question/types';
 import { apiManager } from '@/lib/api/api-manager';
 
 const createQuestion = async (input: CreateQuestionInput): Promise<CreateQuestionResult> => {
@@ -7,6 +12,13 @@ const createQuestion = async (input: CreateQuestionInput): Promise<CreateQuestio
   return response.data;
 };
 
+const getQuestionSet = async (params?: GetQuestionSetParams): Promise<GetQuestionSetNavigationResult> => {
+  const response = await apiManager.apiInstance.get<GetQuestionSetNavigationResult>('/v1/questions', { params });
+
+  return response.data;
+};
+
 export const questionApi = {
-  createQuestion
+  createQuestion,
+  getQuestionSet
 };
