@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react"
+import type { RefObject } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 const DEFAULT_RECT: DOMRect = {
   top: 0,
@@ -9,18 +10,20 @@ const DEFAULT_RECT: DOMRect = {
   y: 0,
   width: 0,
   height: 0,
-  toJSON: () => "{}",
-}
+  toJSON: () => '{}'
+};
 
-export function useContainerSize(element: HTMLElement | null): DOMRect {
-  const [size, setSize] = useState<DOMRect>(
-    () => element?.getBoundingClientRect() ?? DEFAULT_RECT
-  )
+export function useContainerSize(ref: RefObject<HTMLElement | null>): DOMRect {
+  const [size, setSize] = useState<DOMRect>(DEFAULT_RECT);
 
   const handleResize = useCallback(() => {
-    if (!element) return
+    const element = ref.current;
 
-    const newRect = element.getBoundingClientRect()
+    if (!element) {
+      return;
+    }
+
+    const newRect = element.getBoundingClientRect();
 
     setSize((prevRect) => {
       if (
@@ -29,27 +32,35 @@ export function useContainerSize(element: HTMLElement | null): DOMRect {
         Math.round(prevRect.x) === Math.round(newRect.x) &&
         Math.round(prevRect.y) === Math.round(newRect.y)
       ) {
-        return prevRect
+        return prevRect;
       }
-      return newRect
-    })
-  }, [element])
+
+      return newRect;
+    });
+  }, [ref]);
 
   useEffect(() => {
-    if (!element) return
+    const element = ref.current;
 
-    const resizeObserver = new ResizeObserver(handleResize)
-    resizeObserver.observe(element)
+    if (!element) {
+      return;
+    }
 
-    window.addEventListener("click", handleResize)
-    window.addEventListener("resize", handleResize)
+    handleResize();
+
+    const resizeObserver = new ResizeObserver(handleResize);
+
+    resizeObserver.observe(element);
+
+    window.addEventListener('click', handleResize);
+    window.addEventListener('resize', handleResize);
 
     return () => {
-      resizeObserver.disconnect()
-      window.removeEventListener("click", handleResize)
-      window.removeEventListener("resize", handleResize)
-    }
-  }, [element, handleResize])
+      resizeObserver.disconnect();
+      window.removeEventListener('click', handleResize);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [ref, handleResize]);
 
-  return size
+  return size;
 }

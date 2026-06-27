@@ -6,11 +6,11 @@ export default function NewQuestionPage() {
   return (
     <main className="mx-auto flex min-h-full w-full max-w-5xl flex-col gap-8 p-6 md:p-10">
       <div className="space-y-2">
-        <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">
+        <Link href="/" className="text-muted-foreground hover:text-foreground text-sm">
           ← Back to home
         </Link>
         <h1 className="text-3xl font-semibold tracking-tight">Create question set</h1>
-        <p className="max-w-3xl text-muted-foreground">
+        <p className="text-muted-foreground max-w-3xl">
           Post a scenario with one or more questions. The merit engine will generate a marking rubric via the API.
         </p>
       </div>

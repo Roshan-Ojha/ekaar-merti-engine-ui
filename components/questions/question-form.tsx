@@ -21,20 +21,12 @@ import {
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { useCreateQuestion } from '@/features/question/hooks/use-create-question';
 import type { CreateQuestionFormValues } from '@/features/question/schemas/create-question.schema';
-import {
-  createQuestionSchema,
-  emptyQuestionItem
-} from '@/features/question/schemas/create-question.schema';
+import { createQuestionSchema, emptyQuestionItem } from '@/features/question/schemas/create-question.schema';
 import type { CreateQuestionResult } from '@/features/question/types';
 import { ApiError } from '@/lib/api/api-manager';
 
 function getApiErrorMessage(error: ApiError): string {
-  if (
-    error.body &&
-    typeof error.body === 'object' &&
-    'message' in error.body &&
-    error.body.message !== undefined
-  ) {
+  if (error.body && typeof error.body === 'object' && 'message' in error.body && error.body.message !== undefined) {
     const { message } = error.body;
 
     if (typeof message === 'string') {
@@ -66,7 +58,7 @@ function QuestionResult({ result }: { result: CreateQuestionResult }) {
 
         <details className="rounded-lg border p-4">
           <summary className="cursor-pointer text-sm font-medium">View generated rubric</summary>
-          <pre className="mt-4 max-h-96 overflow-auto rounded-md bg-muted p-4 text-xs">
+          <pre className="bg-muted mt-4 max-h-96 overflow-auto rounded-md p-4 text-xs">
             {JSON.stringify(result.rubric, null, 2)}
           </pre>
         </details>
@@ -187,9 +179,7 @@ export function QuestionForm() {
         <div className="flex items-center justify-between gap-4">
           <div>
             <h2 className="text-lg font-medium">Questions</h2>
-            <p className="text-sm text-muted-foreground">
-              Add one or more questions linked to the scenario above.
-            </p>
+            <p className="text-muted-foreground text-sm">Add one or more questions linked to the scenario above.</p>
           </div>
           <Button type="button" variant="outline" size="sm" onClick={() => append(emptyQuestionItem())}>
             <PlusIcon />
@@ -198,7 +188,7 @@ export function QuestionForm() {
         </div>
 
         {form.formState.errors.questions?.root?.message ? (
-          <p className="text-sm text-destructive">{form.formState.errors.questions.root.message}</p>
+          <p className="text-destructive text-sm">{form.formState.errors.questions.root.message}</p>
         ) : null}
 
         {fields.map((field, index) => (
@@ -258,9 +248,7 @@ export function QuestionForm() {
           {isPending ? 'Generating rubric…' : 'Create question set'}
         </Button>
         {isPending ? (
-          <p className="text-sm text-muted-foreground">
-            This may take a minute while the rubric is generated.
-          </p>
+          <p className="text-muted-foreground text-sm">This may take a minute while the rubric is generated.</p>
         ) : null}
       </div>
     </form>

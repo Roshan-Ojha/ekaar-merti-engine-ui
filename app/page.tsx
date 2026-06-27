@@ -8,9 +8,7 @@ export default function Home() {
       <div className="max-w-lg space-y-6 text-center">
         <div className="space-y-4">
           <h1 className="text-3xl font-semibold tracking-tight">Ekaar Merit Engine</h1>
-          <p className="text-muted-foreground">
-            Create scenario-based question sets and generate marking rubrics.
-          </p>
+          <p className="text-muted-foreground">Create scenario-based question sets and generate marking rubrics.</p>
         </div>
         <Button asChild>
           <Link href="/questions/new">Create question set</Link>

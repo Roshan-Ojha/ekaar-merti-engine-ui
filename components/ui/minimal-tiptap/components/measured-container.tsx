@@ -1,32 +1,38 @@
-import * as React from "react"
-import { useContainerSize } from "../hooks/use-container-size"
+import * as React from 'react';
+
+import { useContainerSize } from '../hooks/use-container-size';
 
 interface MeasuredContainerProps<T extends React.ElementType> {
-  as: T
-  name: string
-  children?: React.ReactNode
+  as: T;
+  name: string;
+  children?: React.ReactNode;
 }
 
 export const MeasuredContainer = <T extends React.ElementType>({
   as: Component,
   name,
   children,
-  style = {},
+  style,
   ...props
 }: MeasuredContainerProps<T> & React.ComponentProps<T>) => {
-  const innerRef = React.useRef<HTMLElement>(null)
-  const rect = useContainerSize(innerRef.current)
+  const innerRef = React.useRef<HTMLElement>(null);
+  const rect = useContainerSize(innerRef);
 
-  const customStyle = {
+  const customStyle: React.CSSProperties = {
     [`--${name}-width`]: `${rect.width}px`,
-    [`--${name}-height`]: `${rect.height}px`,
-  }
+    [`--${name}-height`]: `${rect.height}px`
+  };
+
+  const mergedStyle: React.CSSProperties = {
+    ...customStyle,
+    ...(style as React.CSSProperties | undefined)
+  };
 
   return (
-    <Component {...props} ref={innerRef} style={{ ...customStyle, ...style }}>
+    <Component {...props} ref={innerRef} style={mergedStyle}>
       {children}
     </Component>
-  )
-}
+  );
+};
 
-MeasuredContainer.displayName = "MeasuredContainer"
+MeasuredContainer.displayName = 'MeasuredContainer';

@@ -1,59 +1,51 @@
-import * as React from "react"
-import type { Editor } from "@tiptap/react"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
+import * as React from 'react';
+import type { Editor } from '@tiptap/react';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface ImageEditBlockProps {
-  editor: Editor
-  close: () => void
+  editor: Editor;
+  close: () => void;
 }
 
-export const ImageEditBlock: React.FC<ImageEditBlockProps> = ({
-  editor,
-  close,
-}) => {
-  const fileInputRef = React.useRef<HTMLInputElement>(null)
-  const [link, setLink] = React.useState("")
+export const ImageEditBlock: React.FC<ImageEditBlockProps> = ({ editor, close }) => {
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [link, setLink] = React.useState('');
 
   const handleClick = React.useCallback(() => {
-    fileInputRef.current?.click()
-  }, [])
+    fileInputRef.current?.click();
+  }, []);
 
   const handleFile = React.useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const files = e.target.files
-      if (!files?.length) return
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files;
 
-      const insertImages = async () => {
-        const contentBucket = []
-        const filesArray = Array.from(files)
-
-        for (const file of filesArray) {
-          contentBucket.push({ src: file })
-        }
-
-        editor.commands.setImages(contentBucket)
+      if (!files?.length) {
+        return;
       }
 
-      await insertImages()
-      close()
+      const contentBucket = Array.from(files).map((file) => ({ src: file }));
+
+      editor.commands.setImages(contentBucket);
+      close();
     },
     [editor, close]
-  )
+  );
 
   const handleSubmit = React.useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault()
-      e.stopPropagation()
+      e.preventDefault();
+      e.stopPropagation();
 
       if (link) {
-        editor.commands.setImages([{ src: link }])
-        close()
+        editor.commands.setImages([{ src: link }]);
+        close();
       }
     },
     [editor, link, close]
-  )
+  );
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -67,9 +59,7 @@ export const ImageEditBlock: React.FC<ImageEditBlockProps> = ({
             placeholder="https://example.com"
             value={link}
             className="grow"
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setLink(e.target.value)
-            }
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLink(e.target.value)}
           />
           <Button type="submit" className="ml-2">
             Submit
@@ -79,16 +69,7 @@ export const ImageEditBlock: React.FC<ImageEditBlockProps> = ({
       <Button type="button" className="w-full" onClick={handleClick}>
         Upload from your computer
       </Button>
-      <input
-        type="file"
-        accept="image/*"
-        ref={fileInputRef}
-        multiple
-        className="hidden"
-        onChange={handleFile}
-      />
+      <input type="file" accept="image/*" ref={fileInputRef} multiple className="hidden" onChange={handleFile} />
     </form>
-  )
-}
-
-export default ImageEditBlock
+  );
+};
