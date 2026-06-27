@@ -3,7 +3,10 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Inter, JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 
+import { QueryProvider } from '@/components/providers/query-provider';
 import { ThemeProvider } from '@/components/providers/theme-provider';
+import { Toaster } from '@/components/ui/sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 const fontDisplay = Space_Grotesk({
   subsets: ['latin'],
@@ -37,7 +40,12 @@ export default function RootLayout({
       className={`${fontDisplay.variable} ${fontSans.variable} ${fontMono.variable} min-h-full antialiased`}>
       <body className="min-h-full" suppressHydrationWarning>
         <ThemeProvider>
-          <div className="overflow-x-hidden">{children}</div>
+          <TooltipProvider>
+            <QueryProvider>
+              <div className="overflow-x-hidden">{children}</div>
+              <Toaster richColors closeButton />
+            </QueryProvider>
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>
