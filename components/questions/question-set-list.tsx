@@ -84,6 +84,9 @@ function QuestionSetListView({ questionSet, navigation }: QuestionSetListViewPro
           <Link href={`/questions/edit?id=${questionSet.id}`}>Edit question set</Link>
         </Button>
         <Button asChild variant="outline" size="sm">
+          <Link href={`/questions/rubric?id=${questionSet.id}`}>Edit rubric</Link>
+        </Button>
+        <Button asChild variant="outline" size="sm">
           <Link href={`/questions/answer?id=${questionSet.id}`}>Answer questions</Link>
         </Button>
       </div>

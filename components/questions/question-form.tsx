@@ -71,6 +71,10 @@ function QuestionResult({ result, mode }: { result: CreateQuestionResult; mode: 
             {JSON.stringify(result.rubric, null, 2)}
           </pre>
         </details>
+
+        <Button asChild variant="outline" size="sm">
+          <Link href={`/questions/rubric?id=${result.id}`}>Edit rubric</Link>
+        </Button>
       </CardContent>
     </Card>
   );
