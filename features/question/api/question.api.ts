@@ -1,8 +1,12 @@
 import type {
   CreateQuestionInput,
   CreateQuestionResult,
+  GetQuestionDetailParams,
+  GetQuestionDetailResult,
   GetQuestionSetNavigationResult,
-  GetQuestionSetParams
+  GetQuestionSetParams,
+  UpdateQuestionInput,
+  UpdateQuestionResult
 } from '@/features/question/types';
 import { apiManager } from '@/lib/api/api-manager';
 
@@ -18,7 +22,21 @@ const getQuestionSet = async (params?: GetQuestionSetParams): Promise<GetQuestio
   return response.data;
 };
 
+const getQuestionDetail = async (params?: GetQuestionDetailParams): Promise<GetQuestionDetailResult> => {
+  const response = await apiManager.apiInstance.get<GetQuestionDetailResult>('/v1/questions/detail', { params });
+
+  return response.data;
+};
+
+const updateQuestion = async (id: string, input: UpdateQuestionInput): Promise<UpdateQuestionResult> => {
+  const response = await apiManager.apiInstance.patch<UpdateQuestionResult>(`/v1/questions/${id}`, input);
+
+  return response.data;
+};
+
 export const questionApi = {
   createQuestion,
-  getQuestionSet
+  getQuestionSet,
+  getQuestionDetail,
+  updateQuestion
 };

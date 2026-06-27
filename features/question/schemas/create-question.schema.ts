@@ -15,6 +15,17 @@ export const createQuestionSchema = z.object({
 
 export type CreateQuestionFormValues = z.infer<typeof createQuestionSchema>;
 
+export const editQuestionItemSchema = questionItemSchema.extend({
+  id: z.string().uuid().optional()
+});
+
+export const editQuestionSchema = z.object({
+  scenario: z.string().optional(),
+  questions: z.array(editQuestionItemSchema).min(1, 'At least one question is required')
+});
+
+export type EditQuestionFormValues = z.infer<typeof editQuestionSchema>;
+
 export const emptyQuestionItem = (): CreateQuestionFormValues['questions'][number] => ({
   question: '',
   answerTips: '',

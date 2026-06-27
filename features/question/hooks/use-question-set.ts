@@ -8,7 +8,7 @@ import { questionKeys } from './question-query-keys';
 
 export const useQuestionSet = (params?: GetQuestionSetParams) => {
   return useQuery({
-    queryKey: questionKeys.detail(params?.id ?? 'latest'),
+    queryKey: questionKeys.set(params?.id ?? 'latest'),
     queryFn: () => questionApi.getQuestionSet(params)
   });
 };

@@ -63,3 +63,43 @@ export interface GetQuestionSetParams {
   id?: string;
   direction?: 'next' | 'previous';
 }
+
+export interface GetQuestionDetailItem {
+  id: string;
+  sortOrder: number;
+  question: string;
+  answerTips: string;
+  markingScheme: string;
+  examinerComments: string;
+  suggestedAnswer: string;
+}
+
+export interface GetQuestionDetailSet {
+  id: string;
+  scenario: string | null;
+  questions: GetQuestionDetailItem[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GetQuestionDetailResult {
+  questionSet: GetQuestionDetailSet;
+  navigation: QuestionSetNavigation;
+}
+
+export interface GetQuestionDetailParams {
+  id?: string;
+  direction?: 'next' | 'previous';
+  index?: number;
+}
+
+export interface UpdateQuestionItemInput extends QuestionItemInput {
+  id?: string;
+}
+
+export interface UpdateQuestionInput {
+  scenario?: string;
+  questions?: UpdateQuestionItemInput[];
+}
+
+export type UpdateQuestionResult = CreateQuestionResult;
