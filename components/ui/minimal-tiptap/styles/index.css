@@ -190,34 +190,46 @@
 }
 
 /* Tables */
-.minimal-tiptap-editor .ProseMirror table {
-  @apply border-border my-4 w-full border-collapse overflow-hidden rounded-lg border;
+.minimal-tiptap-editor .tableWrapper {
+  @apply my-4 w-full overflow-x-auto;
 }
 
-.minimal-tiptap-editor .ProseMirror table td,
-.minimal-tiptap-editor .ProseMirror table th {
+.minimal-tiptap-editor > table,
+.minimal-tiptap-editor .tableWrapper > table,
+.minimal-tiptap-editor table {
+  @apply border-border my-4 w-full border-collapse rounded-lg border;
+  display: table;
+}
+
+.minimal-tiptap-editor .tableWrapper > table {
+  @apply my-0;
+}
+
+.minimal-tiptap-editor table td,
+.minimal-tiptap-editor table th {
   @apply border-border relative min-w-[100px] border px-3 py-2 text-left align-top;
+  display: table-cell;
 }
 
-.minimal-tiptap-editor .ProseMirror table th {
+.minimal-tiptap-editor table th {
   @apply bg-muted font-semibold;
 }
 
-.minimal-tiptap-editor .ProseMirror table .selectedCell {
+.minimal-tiptap-editor table td p,
+.minimal-tiptap-editor table th p {
+  @apply m-0;
+}
+
+.minimal-tiptap-editor table .selectedCell {
   @apply bg-primary/10;
 }
 
-.minimal-tiptap-editor .ProseMirror table .selectedCell::after {
+.minimal-tiptap-editor table .selectedCell::after {
   @apply bg-primary/10 pointer-events-none absolute inset-0 content-[''];
 }
 
-/* Column resize handle */
-.minimal-tiptap-editor .ProseMirror .column-resize-handle {
+.minimal-tiptap-editor .column-resize-handle {
   @apply bg-primary/50 absolute top-0 -right-0.5 bottom-0 z-10 w-1 cursor-col-resize;
-}
-
-.minimal-tiptap-editor .ProseMirror.resize-cursor {
-  @apply cursor-col-resize;
 }
 
 /* Mentions */
