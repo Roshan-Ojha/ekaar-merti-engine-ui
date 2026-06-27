@@ -37,10 +37,18 @@ export function useTiptapEditor(providedEditor?: Editor | null): {
       return {
         editor: context.editor,
         editorState: context.editor.state,
-        canCommand: context.editor.can.bind(context.editor)
+        // eslint-disable-next-line @typescript-eslint/unbound-method -- TipTap invokes `can` on the editor instance
+        canCommand: context.editor.can
       };
     }
   });
 
-  return editorState ?? { editor: null };
+  const fallbackResult = useMemo(
+    () => ({
+      editor: mainEditor ?? null
+    }),
+    [mainEditor]
+  );
+
+  return editorState ?? fallbackResult;
 }

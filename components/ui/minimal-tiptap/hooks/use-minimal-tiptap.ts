@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback } from 'react';
 import { TaskItem, TaskList } from '@tiptap/extension-list';
 import { TableKit } from '@tiptap/extension-table';

@@ -1,3 +1,5 @@
+'use client';
+
 import './styles/index.css';
 
 import type { Content, Editor } from '@tiptap/react';
@@ -70,6 +72,12 @@ export const MinimalTiptapEditor = ({
     ...props
   });
 
+  // useEditor returns null on the first client render when immediatelyRender is false.
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TipTap runtime null before mount
+  if (editor === null) {
+    return null;
+  }
+
   return (
     <EditorContext.Provider value={{ editor }}>
       <MainMinimalTiptapEditor editor={editor} className={className} editorContentClassName={editorContentClassName} />
@@ -83,7 +91,7 @@ export const MainMinimalTiptapEditor = ({
   editor: providedEditor,
   className,
   editorContentClassName
-}: MinimalTiptapProps & { editor: Editor }) => {
+}: MinimalTiptapProps & { editor: Editor | null }) => {
   const { editor } = useTiptapEditor(providedEditor);
 
   if (!editor) {
