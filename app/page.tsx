@@ -15,6 +15,9 @@ export default function Home() {
             <Link href="/questions/new">Create question set</Link>
           </Button>
           <Button asChild variant="outline">
+            <Link href="/questions">Browse question sets</Link>
+          </Button>
+          <Button asChild variant="outline">
             <Link href="/questions/answer">Answer questions</Link>
           </Button>
         </div>

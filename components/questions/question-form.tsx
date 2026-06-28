@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2Icon, PlusIcon, Trash2Icon } from 'lucide-react';
+import { ChevronLeftIcon, ChevronRightIcon, Loader2Icon, PlusIcon, Trash2Icon } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { Badge } from '@/components/ui/badge';
@@ -20,9 +22,15 @@ import {
 } from '@/components/ui/field';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { useCreateQuestion } from '@/features/question/hooks/use-create-question';
-import type { CreateQuestionFormValues } from '@/features/question/schemas/create-question.schema';
-import { createQuestionSchema, emptyQuestionItem } from '@/features/question/schemas/create-question.schema';
-import type { CreateQuestionResult } from '@/features/question/types';
+import { useQuestionDetail } from '@/features/question/hooks/use-question-detail';
+import { useUpdateQuestion } from '@/features/question/hooks/use-update-question';
+import type { EditQuestionFormValues } from '@/features/question/schemas/create-question.schema';
+import {
+  createQuestionSchema,
+  editQuestionSchema,
+  emptyQuestionItem
+} from '@/features/question/schemas/create-question.schema';
+import type { CreateQuestionResult, GetQuestionDetailSet, QuestionSetNavigation } from '@/features/question/types';
 import { ApiError } from '@/lib/api/api-manager';
 
 function getApiErrorMessage(error: ApiError): string {
@@ -41,13 +49,14 @@ function getApiErrorMessage(error: ApiError): string {
   return error.message;
 }
 
-function QuestionResult({ result }: { result: CreateQuestionResult }) {
+function QuestionResult({ result, mode }: { result: CreateQuestionResult; mode: 'create' | 'edit' }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Question set created</CardTitle>
+        <CardTitle>{mode === 'create' ? 'Question set created' : 'Question set updated'}</CardTitle>
         <CardDescription>
-          Rubric generated and saved. Question set ID: <code className="text-xs">{result.id}</code>
+          Rubric {mode === 'create' ? 'generated' : 'regenerated'} and saved. Question set ID:{' '}
+          <code className="text-xs">{result.id}</code>
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -62,6 +71,10 @@ function QuestionResult({ result }: { result: CreateQuestionResult }) {
             {JSON.stringify(result.rubric, null, 2)}
           </pre>
         </details>
+
+        <Button asChild variant="outline" size="sm">
+          <Link href={`/questions/rubric?id=${result.id}`}>Edit rubric</Link>
+        </Button>
       </CardContent>
     </Card>
   );
@@ -83,17 +96,39 @@ const questionFields = [
   { name: 'suggestedAnswer', label: 'Suggested answer', description: 'Model answer with formatted text and tables.' }
 ] as const;
 
-export function QuestionForm() {
+interface QuestionSetFormProps {
+  mode: 'create' | 'edit';
+  questionSet?: GetQuestionDetailSet;
+  navigation?: QuestionSetNavigation;
+}
+
+function QuestionSetForm({ mode, questionSet, navigation }: QuestionSetFormProps) {
+  const router = useRouter();
   const [result, setResult] = useState<CreateQuestionResult | null>(null);
   const [formKey, setFormKey] = useState(0);
-  const { mutate: createQuestion, isPending } = useCreateQuestion();
+  const { mutate: createQuestion, isPending: isCreating } = useCreateQuestion();
+  const { mutate: updateQuestion, isPending: isUpdating } = useUpdateQuestion(questionSet?.id ?? '');
+  const isPending = mode === 'create' ? isCreating : isUpdating;
 
-  const form = useForm<CreateQuestionFormValues>({
-    resolver: zodResolver(createQuestionSchema),
-    defaultValues: {
-      scenario: '',
-      questions: [emptyQuestionItem()]
-    }
+  const form = useForm<EditQuestionFormValues>({
+    resolver: zodResolver(mode === 'create' ? createQuestionSchema : editQuestionSchema),
+    defaultValues:
+      mode === 'edit' && questionSet
+        ? {
+            scenario: questionSet.scenario ?? '',
+            questions: questionSet.questions.map((question) => ({
+              id: question.id,
+              question: question.question,
+              answerTips: question.answerTips,
+              markingScheme: question.markingScheme,
+              examinerComments: question.examinerComments,
+              suggestedAnswer: question.suggestedAnswer
+            }))
+          }
+        : {
+            scenario: '',
+            questions: [emptyQuestionItem()]
+          }
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -102,51 +137,135 @@ export function QuestionForm() {
   });
 
   const onSubmit = form.handleSubmit((values) => {
-    const payload = {
-      ...values,
-      scenario: values.scenario?.trim() ? values.scenario : undefined
-    };
+    const scenario = values.scenario?.trim() ? values.scenario : undefined;
 
-    createQuestion(payload, {
-      onSuccess: (data) => {
-        setResult(data);
-        toast.success('Question set created and rubric generated.');
-      },
-      onError: (error) => {
-        if (error instanceof ApiError) {
-          toast.error(getApiErrorMessage(error));
+    if (mode === 'create') {
+      createQuestion(
+        { scenario, questions: values.questions },
+        {
+          onSuccess: (data) => {
+            setResult(data);
+            toast.success('Question set created and rubric generated.');
+          },
+          onError: (error) => {
+            if (error instanceof ApiError) {
+              toast.error(getApiErrorMessage(error));
 
-          return;
+              return;
+            }
+
+            toast.error('Failed to create question set. Please try again.');
+          }
         }
+      );
 
-        toast.error('Failed to create question set. Please try again.');
+      return;
+    }
+
+    updateQuestion(
+      {
+        scenario,
+        questions: values.questions.map((question) => ({
+          ...(question.id ? { id: question.id } : {}),
+          question: question.question,
+          answerTips: question.answerTips,
+          markingScheme: question.markingScheme,
+          examinerComments: question.examinerComments,
+          suggestedAnswer: question.suggestedAnswer
+        }))
+      },
+      {
+        onSuccess: (data) => {
+          setResult(data);
+          toast.success('Question set updated and rubric regenerated.');
+        },
+        onError: (error) => {
+          if (error instanceof ApiError) {
+            toast.error(getApiErrorMessage(error));
+
+            return;
+          }
+
+          toast.error('Failed to update question set. Please try again.');
+        }
       }
-    });
+    );
   });
+
+  const navigateToSet = (id: string | null) => {
+    if (!id) {
+      return;
+    }
+
+    router.push(`/questions/edit?id=${id}`);
+  };
 
   if (result) {
     return (
       <div className="space-y-6">
-        <QuestionResult result={result} />
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => {
-            setResult(null);
-            form.reset({
-              scenario: '',
-              questions: [emptyQuestionItem()]
-            });
-            setFormKey((current) => current + 1);
-          }}>
-          Create another question set
-        </Button>
+        <QuestionResult result={result} mode={mode} />
+        {mode === 'create' ? (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              setResult(null);
+              form.reset({
+                scenario: '',
+                questions: [emptyQuestionItem()]
+              });
+              setFormKey((current) => current + 1);
+            }}>
+            Create another question set
+          </Button>
+        ) : (
+          <div className="flex flex-wrap gap-3">
+            <Button type="button" variant="outline" onClick={() => setResult(null)}>
+              Continue editing
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/questions">Browse question sets</Link>
+            </Button>
+          </div>
+        )}
       </div>
     );
   }
 
   return (
     <form key={formKey} onSubmit={onSubmit} className="space-y-8">
+      {mode === 'edit' && navigation ? (
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="outline">
+              Set {navigation.index} of {navigation.total}
+            </Badge>
+            <Badge variant="outline">{questionSet?.questions.length ?? 0} question(s)</Badge>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={!navigation.previousId}
+              onClick={() => navigateToSet(navigation.previousId)}>
+              <ChevronLeftIcon />
+              Previous set
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={!navigation.nextId}
+              onClick={() => navigateToSet(navigation.nextId)}>
+              Next set
+              <ChevronRightIcon />
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
       <FieldSet>
         <FieldLegend>Scenario</FieldLegend>
         <FieldDescription>
@@ -245,12 +364,70 @@ export function QuestionForm() {
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={isPending}>
           {isPending ? <Loader2Icon className="animate-spin" /> : null}
-          {isPending ? 'Generating rubric…' : 'Create question set'}
+          {isPending
+            ? mode === 'create'
+              ? 'Generating rubric…'
+              : 'Regenerating rubric…'
+            : mode === 'create'
+              ? 'Create question set'
+              : 'Save question set'}
         </Button>
         {isPending ? (
-          <p className="text-muted-foreground text-sm">This may take a minute while the rubric is generated.</p>
+          <p className="text-muted-foreground text-sm">
+            This may take a minute while the rubric is {mode === 'create' ? 'generated' : 'regenerated'}.
+          </p>
         ) : null}
       </div>
     </form>
+  );
+}
+
+export interface QuestionFormProps {
+  questionSetId?: string;
+}
+
+export function QuestionForm({ questionSetId }: QuestionFormProps) {
+  const isEditMode = !!questionSetId;
+  const { data, isLoading, isError, error } = useQuestionDetail(isEditMode ? { id: questionSetId } : undefined, {
+    enabled: isEditMode
+  });
+
+  if (isEditMode && isLoading) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <Loader2Icon className="text-muted-foreground size-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (isEditMode && isError) {
+    const message = error instanceof ApiError ? getApiErrorMessage(error) : 'Failed to load question set.';
+
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Unable to load question set</CardTitle>
+          <CardDescription>{message}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button asChild variant="outline">
+            <Link href="/questions/edit">Try again</Link>
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (isEditMode && !data) {
+    return null;
+  }
+
+  return (
+    <QuestionSetForm
+      key={isEditMode ? data?.questionSet.id : 'create'}
+      mode={isEditMode ? 'edit' : 'create'}
+      questionSet={data?.questionSet}
+      navigation={data?.navigation}
+    />
   );
 }
