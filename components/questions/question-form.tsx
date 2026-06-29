@@ -73,7 +73,7 @@ function QuestionResult({ result, mode }: { result: CreateQuestionResult; mode: 
         </details>
 
         <Button asChild variant="outline" size="sm">
-          <Link href={`/questions/rubric?id=${result.id}`}>Edit rubric</Link>
+          <Link href={`/questions/${result.id}/rubric`}>Edit rubric</Link>
         </Button>
       </CardContent>
     </Card>
@@ -197,7 +197,7 @@ function QuestionSetForm({ mode, questionSet, navigation }: QuestionSetFormProps
       return;
     }
 
-    router.push(`/questions/edit?id=${id}`);
+    router.push(`/questions/${id}/edit`);
   };
 
   if (result) {
@@ -411,7 +411,7 @@ export function QuestionForm({ questionSetId }: QuestionFormProps) {
         </CardHeader>
         <CardContent>
           <Button asChild variant="outline">
-            <Link href="/questions/edit">Try again</Link>
+            <Link href={`/questions/${questionSetId}/edit`}>Try again</Link>
           </Button>
         </CardContent>
       </Card>

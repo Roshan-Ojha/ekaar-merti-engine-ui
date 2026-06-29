@@ -112,7 +112,7 @@ function EvaluationResult({
 }
 
 export interface AnswerFormProps {
-  questionSetId?: string;
+  questionSetId: string;
 }
 
 interface QuestionSetAnswerFormProps {
@@ -172,7 +172,7 @@ function QuestionSetAnswerForm({ questionSet, navigation }: QuestionSetAnswerFor
       return;
     }
 
-    router.push(`/questions/answer?id=${id}`);
+    router.push(`/questions/${id}/answer`);
   };
 
   if (evaluationResult) {
@@ -294,7 +294,7 @@ function QuestionSetAnswerForm({ questionSet, navigation }: QuestionSetAnswerFor
 }
 
 export function AnswerForm({ questionSetId }: AnswerFormProps) {
-  const { data, isLoading, isError, error } = useQuestionSet(questionSetId ? { id: questionSetId } : undefined);
+  const { data, isLoading, isError, error } = useQuestionSet({ id: questionSetId });
 
   if (isLoading) {
     return (
@@ -315,7 +315,7 @@ export function AnswerForm({ questionSetId }: AnswerFormProps) {
         </CardHeader>
         <CardContent>
           <Button asChild variant="outline">
-            <Link href="/questions/answer">Try again</Link>
+            <Link href={`/questions/${questionSetId}/answer`}>Try again</Link>
           </Button>
         </CardContent>
       </Card>

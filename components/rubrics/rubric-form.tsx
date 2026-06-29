@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { useQuestionSet } from '@/features/question/hooks/use-question-set';
-import type { QuestionSetNavigation } from '@/features/question/types';
+import type { GetQuestionSetResult, QuestionSetNavigation } from '@/features/question/types';
 import { useRubric } from '@/features/rubric/hooks/use-rubric';
 import { useUpdateRubric } from '@/features/rubric/hooks/use-update-rubric';
 import type { RubricResult } from '@/features/rubric/types';
@@ -37,9 +37,10 @@ function getApiErrorMessage(error: ApiError): string {
 interface RubricEditorProps {
   rubric: RubricResult;
   navigation: QuestionSetNavigation;
+  questionSet: GetQuestionSetResult;
 }
 
-function RubricEditor({ rubric, navigation }: RubricEditorProps) {
+function RubricEditor({ rubric, navigation, questionSet }: RubricEditorProps) {
   const router = useRouter();
   const [jsonText, setJsonText] = useState(() => formatRubricJson(rubric.rubric));
   const [parseError, setParseError] = useState<string | null>(null);
@@ -50,7 +51,7 @@ function RubricEditor({ rubric, navigation }: RubricEditorProps) {
       return;
     }
 
-    router.push(`/questions/rubric?id=${id}`);
+    router.push(`/questions/${id}/rubric`);
   };
 
   const handleReset = () => {
@@ -122,10 +123,10 @@ function RubricEditor({ rubric, navigation }: RubricEditorProps) {
 
       <div className="flex flex-wrap gap-3">
         <Button asChild variant="outline" size="sm">
-          <Link href={`/questions?id=${rubric.questionSetId}`}>View question set</Link>
+          <Link href={`/questions/${questionSet.id}`}>View question set</Link>
         </Button>
         <Button asChild variant="outline" size="sm">
-          <Link href={`/questions/edit?id=${rubric.questionSetId}`}>Edit questions</Link>
+          <Link href={`/questions/${questionSet.id}/edit`}>Edit questions</Link>
         </Button>
       </div>
 
@@ -210,7 +211,7 @@ export function RubricForm({ questionSetId }: RubricFormProps) {
         </CardHeader>
         <CardContent>
           <Button asChild variant="outline">
-            <Link href="/questions/rubric">Try again</Link>
+            <Link href={`/questions/${questionSetId}/rubric`}>Try again</Link>
           </Button>
         </CardContent>
       </Card>
@@ -228,7 +229,7 @@ export function RubricForm({ questionSetId }: RubricFormProps) {
         </CardHeader>
         <CardContent>
           <Button asChild variant="outline">
-            <Link href="/questions/rubric">Try again</Link>
+            <Link href={`/questions/${questionSetId}/rubric`}>Try again</Link>
           </Button>
         </CardContent>
       </Card>
@@ -239,5 +240,12 @@ export function RubricForm({ questionSetId }: RubricFormProps) {
     return null;
   }
 
-  return <RubricEditor key={rubricData.questionSetId} rubric={rubricData} navigation={questionSetData.navigation} />;
+  return (
+    <RubricEditor
+      key={rubricData.questionSetId}
+      rubric={rubricData}
+      navigation={questionSetData.navigation}
+      questionSet={questionSetData.questionSet}
+    />
+  );
 }

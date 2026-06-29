@@ -1,27 +1,15 @@
-import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
-import { QuestionForm } from '@/components/questions/question-form';
-
-interface EditQuestionPageProps {
+interface LegacyEditRedirectProps {
   searchParams: Promise<{ id?: string }>;
 }
 
-export default async function EditQuestionPage({ searchParams }: EditQuestionPageProps) {
+export default async function LegacyEditRedirect({ searchParams }: LegacyEditRedirectProps) {
   const { id } = await searchParams;
 
-  return (
-    <main className="mx-auto flex min-h-full w-full max-w-5xl flex-col gap-8 p-6 md:p-10">
-      <div className="space-y-2">
-        <Link href="/questions" className="text-muted-foreground hover:text-foreground text-sm">
-          ← Back to question sets
-        </Link>
-        <h1 className="text-3xl font-semibold tracking-tight">Edit question set</h1>
-        <p className="text-muted-foreground max-w-3xl">
-          Update the scenario and questions. Saving will regenerate the marking rubric via the API.
-        </p>
-      </div>
+  if (id) {
+    redirect(`/questions/${id}/edit`);
+  }
 
-      <QuestionForm questionSetId={id} />
-    </main>
-  );
+  redirect('/questions/new');
 }

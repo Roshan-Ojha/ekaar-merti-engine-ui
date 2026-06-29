@@ -41,7 +41,7 @@ function QuestionSetListView({ questionSet, navigation }: QuestionSetListViewPro
       return;
     }
 
-    router.push(`/questions?id=${id}`);
+    router.push(`/questions/${id}`);
   };
 
   return (
@@ -81,13 +81,13 @@ function QuestionSetListView({ questionSet, navigation }: QuestionSetListViewPro
 
       <div className="flex flex-wrap gap-3">
         <Button asChild size="sm">
-          <Link href={`/questions/edit?id=${questionSet.id}`}>Edit question set</Link>
+          <Link href={`/questions/${questionSet.id}/edit`}>Edit question set</Link>
         </Button>
         <Button asChild variant="outline" size="sm">
-          <Link href={`/questions/rubric?id=${questionSet.id}`}>Edit rubric</Link>
+          <Link href={`/questions/${questionSet.id}/rubric`}>Edit rubric</Link>
         </Button>
         <Button asChild variant="outline" size="sm">
-          <Link href={`/questions/answer?id=${questionSet.id}`}>Answer questions</Link>
+          <Link href={`/questions/${questionSet.id}/answer`}>Answer questions</Link>
         </Button>
       </div>
 
@@ -125,11 +125,11 @@ function QuestionSetListView({ questionSet, navigation }: QuestionSetListViewPro
 }
 
 export interface QuestionSetListProps {
-  questionSetId?: string;
+  questionSetId: string;
 }
 
 export function QuestionSetList({ questionSetId }: QuestionSetListProps) {
-  const { data, isLoading, isError, error } = useQuestionSet(questionSetId ? { id: questionSetId } : undefined);
+  const { data, isLoading, isError, error } = useQuestionSet({ id: questionSetId });
 
   if (isLoading) {
     return (
@@ -150,7 +150,7 @@ export function QuestionSetList({ questionSetId }: QuestionSetListProps) {
         </CardHeader>
         <CardContent>
           <Button asChild variant="outline">
-            <Link href="/questions">Try again</Link>
+            <Link href={`/questions/${questionSetId}`}>Try again</Link>
           </Button>
         </CardContent>
       </Card>

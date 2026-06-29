@@ -1,6 +1,4 @@
-import Link from 'next/link';
-
-import { Button } from '@/components/ui/button';
+import { HomeActions } from '@/components/home/home-actions';
 
 export default function Home() {
   return (
@@ -10,17 +8,7 @@ export default function Home() {
           <h1 className="text-3xl font-semibold tracking-tight">Ekaar Merit Engine</h1>
           <p className="text-muted-foreground">Create scenario-based question sets and answer exam questions.</p>
         </div>
-        <div className="flex flex-wrap justify-center gap-3">
-          <Button asChild>
-            <Link href="/questions/new">Create question set</Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link href="/questions">Browse question sets</Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link href="/questions/answer">Answer questions</Link>
-          </Button>
-        </div>
+        <HomeActions />
       </div>
     </main>
   );
